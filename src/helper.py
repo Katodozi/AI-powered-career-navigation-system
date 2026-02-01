@@ -14,7 +14,7 @@ def extract_skills_from_description(description: str) -> List[str]:
     "Wordpress", "Swift", "SwiftUI", "Go", "Golang", "Java", "Python", "C++", "C", "VB.NET",
     "ASP.NET", "Android/Java", "iOS/Objective-C", "FastAPI", "Java Spring Boot", "Django",
     "Ruby on Rails", "PHP", "Kotlin", "Rust", "Scala", "Elixir", "Spring Boot", "Quarkus",
-    " Micronaut", "Blazor", "Svelte", "SvelteKit", "Remix", "Solid.js", "Qwik",
+    " Micronaut", "Blazor", "Svelte", "SvelteKit", "Remix", "Solid.js", "Qwik", "Django", "flash", "Django Rest Framework",
     
     # === FRONTEND & STYLING (22) ===
     "Tailwind CSS", "Bootstrap", "Sass", "styled-components", "CSS Modules", "Semantic UI",
