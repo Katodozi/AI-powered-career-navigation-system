@@ -21,20 +21,35 @@ def recommend_jobs(user_skills: List[str], top_n: int = 5) -> List[Dict]:
     if not user_skills:
         return []
 
-    user_skills = list(set(map(normalize, user_skills)))
+    # Normalize and remove duplicates + short skills
+    user_skills = list({
+        normalize(s) for s in user_skills
+        if isinstance(s, str) and len(normalize(s)) > 1
+    })
+
+    user_skill_set = set(user_skills)
+
     recommendations = []
 
     for job in jobs_col.find():
+
         job_skills = job.get("skills_required", [])
 
         if not job_skills:
             job_skills = extract_skills_from_description(job.get("description", ""))
             job["skills_required"] = job_skills
 
-        job_skills = list(set(map(normalize, job_skills)))
+        job_skills = list({
+            normalize(s) for s in job_skills
+            if isinstance(s, str) and len(normalize(s)) > 1
+        })
+
+        job_skill_set = set(job_skills)
+
         title = normalize(job.get("title", ""))
 
         score = 0
+
         explanation = {
             "direct": [],
             "category": [],
@@ -43,39 +58,52 @@ def recommend_jobs(user_skills: List[str], top_n: int = 5) -> List[Dict]:
         }
 
         # -------- Direct Matches --------
-        for us in user_skills:
-            if us in job_skills:
-                score += DIRECT_MATCH_WEIGHT
-                explanation["direct"].append(us)
+        direct_matches = user_skill_set.intersection(job_skill_set)
+
+        for skill in direct_matches:
+            score += DIRECT_MATCH_WEIGHT
+            explanation["direct"].append(skill)
 
         # -------- Category Partial Match --------
         for cat, skills in CATEGORY_ALIASES.items():
-            if cat in job_skills:
-                for us in user_skills:
+
+            cat = normalize(cat)
+
+            if cat in job_skill_set:
+
+                for us in user_skill_set:
                     if us in skills:
                         score += CATEGORY_MATCH_WEIGHT
                         explanation["category"].append(f"{us} → {cat}")
 
         # -------- Related Skills --------
-        for us in user_skills:
-            for rs in SKILL_GRAPH.get(us, {}).get("related", []):
-                if rs in job_skills:
+        for us in user_skill_set:
+
+            related_skills = SKILL_GRAPH.get(us, {}).get("related", [])
+
+            for rs in related_skills:
+                rs = normalize(rs)
+
+                if rs in job_skill_set:
                     score += RELATED_MATCH_WEIGHT
                     explanation["related"].append(f"{us} → {rs}")
 
         # -------- Title Priority Boost --------
-        for us in user_skills:
-            if us in title and us in job_skills:
+        for us in user_skill_set:
+
+            if us in job_skill_set and f" {us} " in f" {title} ":
                 score += PRIMARY_WEIGHT
                 explanation["title_boost"].append(us)
 
         if score == 0:
             continue
 
-        max_possible = len(job_skills) * PRIMARY_WEIGHT
+        # -------- Final Score --------
+        max_possible = max(len(job_skill_set) * PRIMARY_WEIGHT, 1)
+
         final_score = min(int((score / max_possible) * 100), 100)
 
-        skill_gaps = sorted(set(job_skills) - set(user_skills))
+        skill_gaps = sorted(job_skill_set - user_skill_set)
 
         recommendations.append({
             "job": job,
@@ -85,4 +113,5 @@ def recommend_jobs(user_skills: List[str], top_n: int = 5) -> List[Dict]:
         })
 
     recommendations.sort(key=lambda x: x["match_score"], reverse=True)
+
     return recommendations[:top_n]

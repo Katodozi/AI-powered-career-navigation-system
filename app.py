@@ -5,10 +5,11 @@ from src.job_api import MerojobScraper
 from src.recommender import recommend_jobs
 from src.mcq_engine import generate_mcqs
 from src.mcq_engine import generate_learning_resources
+from src.resume_parser import parse_resume
 
 # ------------------ PAGE CONFIG ------------------
 st.set_page_config(
-    page_title="AI-Powered Career Navigation System",
+    page_title="🧠 AI-Powered Career Navigation System",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -24,230 +25,355 @@ def get_db():
 
 jobs_col = get_db()
 
-# ------------------ CUSTOM CSS ------------------
+# ------------------ ENHANCED GLOBAL CSS ------------------
 st.markdown(
-    """
-    <style>
-    /* ---------- Global ---------- */
-    body {
-        background-color: #0b1220;
-        color: #e5e7eb;
-        font-family: 'Inter', 'Segoe UI', sans-serif;
-    }
+"""
+<style>
 
-    /* ---------- Sidebar ---------- */
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #020617, #020617);
-        border-right: 1px solid #1e293b;
-    }
+/* ---------- GLOBAL BACKGROUND ---------- */
+body {
+    background: radial-gradient(circle at 20% 20%, #1e293b, #020617 70%);
+    background-attachment: fixed;
+    color: #e5e7eb;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
 
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3 {
-        color: #e5e7eb;
-    }
+/* subtle animated glow */
+body::before{
+content:"";
+position:fixed;
+top:-200px;
+left:-200px;
+width:600px;
+height:600px;
+background:radial-gradient(circle,#3b82f6 0%,transparent 70%);
+opacity:.15;
+filter:blur(120px);
+z-index:-1;
+}
 
-    /* ---------- Dashboard Header ---------- */
-    .dashboard-header {
-        padding: 2.5rem 1rem 2rem 1rem;
-        text-align: center;
-        border-bottom: 1px solid #1e293b;
-        margin-bottom: 2rem;
-    }
+/* ---------- SCROLLBAR ---------- */
+::-webkit-scrollbar {
+width:8px;
+}
 
-    .dashboard-header h1 {
-        font-size: 3rem;
-        font-weight: 800;
-        background: linear-gradient(90deg, #3b82f6, #22d3ee);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0.5rem;
-    }
+::-webkit-scrollbar-thumb{
+background:#334155;
+border-radius:6px;
+}
 
-    .dashboard-header p {
-        font-size: 1.15rem;
-        color: #cbd5f5;
-        max-width: 900px;
-        margin: 0 auto;
-        line-height: 1.7;
-    }
+/* ---------- SIDEBAR ---------- */
+section[data-testid="stSidebar"]{
+background:linear-gradient(180deg,#020617,#0f172a);
+border-right:1px solid #1e293b;
+}
 
-    /* ---------- Dashboard Cards ---------- */
-    .dash-card {
-        background: #020617;
-        border: 1px solid #1e293b;
-        border-radius: 14px;
-        padding: 1.2rem;
-        height: 100%;
-    }
+/* ---------- PAGE HEADINGS ---------- */
+.page-title{
+font-size:2.4rem;
+font-weight:800;
+background:linear-gradient(90deg,#60a5fa,#22d3ee);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+margin-bottom:5px;
+}
 
+.page-sub{
+color:#94a3b8;
+margin-bottom:30px;
+}
 
-    .dash-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15);
-    }
+/* ---------- DASHBOARD HEADER ---------- */
+.dashboard-header{
+text-align:center;
+margin-bottom:40px;
+}
 
-    .dash-card h3 {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #3b82f6;
-        margin-bottom: 0.5rem;
-    }
+.dashboard-header h1{
+font-size:3rem;
+font-weight:900;
+background:linear-gradient(90deg,#60a5fa,#22d3ee);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
 
-    .dash-card p {
-        font-size: 0.95rem;
-        color: #cbd5e1;
-        line-height: 1.6;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
+.dashboard-header p{
+color:#cbd5e1;
+max-width:800px;
+margin:auto;
+}
+
+/* ---------- CARDS ---------- */
+.dash-card{
+background:#020617;
+border:1px solid #1e293b;
+border-radius:16px;
+padding:1.5rem;
+transition:all .25s ease;
+height:100%;
+}
+
+.dash-card:hover{
+transform:translateY(-6px);
+box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+
+.dash-card h3{
+color:#60a5fa;
+margin-bottom:10px;
+}
+
+.dash-card p{
+color:#cbd5e1;
+font-size:0.95rem;
+}
+
+/* ---------- BUTTONS (SOFTER COLORS) ---------- */
+.stButton > button{
+background:linear-gradient(135deg,#2563eb,#0ea5e9);
+border:none;
+border-radius:10px;
+color:white;
+font-weight:600;
+padding:.55rem 1.2rem;
+transition:.25s;
+}
+
+.stButton > button:hover{
+background:linear-gradient(135deg,#1d4ed8,#0284c7);
+transform:translateY(-1px);
+}
+
+/* ---------- TEAM CARDS ---------- */
+.team-card{
+background:#020617;
+border:1px solid #1e293b;
+border-radius:16px;
+padding:1.2rem;
+text-align:center;
+}
+
+.team-card img{
+border-radius:50%;
+margin-bottom:10px;
+}
+
+.team-card h4{
+margin-bottom:2px;
+color:#60a5fa;
+}
+
+.team-card p{
+font-size:.85rem;
+color:#94a3b8;
+}
+
+/* ---------- FEEDBACK BOX ---------- */
+.feedback-box{
+background:#020617;
+border:1px solid #1e293b;
+border-radius:14px;
+padding:20px;
+margin-top:30px;
+}
+
+</style>
+""",
+unsafe_allow_html=True
 )
 
-# ------------------ SIDEBAR NAVIGATION ------------------
-st.sidebar.markdown("## 🧠 Career Navigator")
-st.sidebar.caption("AI-powered career intelligence platform")
+# ------------------ SIDEBAR ------------------
+st.sidebar.markdown(
+"""
+<h2 style="text-align:center;">🧠 Career Navigator</h2>
+<p style="text-align:center;color:#94a3b8;">
+AI Career Intelligence Platform
+</p>
+""",
+unsafe_allow_html=True
+)
 
-page = st.sidebar.radio(
-    "Navigate",
-    [
-        "🏠 Dashboard",
-        "🕷️ Scrape & Search Jobs",
-        "🤖 Job Recommendations",
-        "📝 Self Assessment",
-        "📈 Learning Roadmap",
-    ]
+page = st.sidebar.selectbox(
+"Navigate",
+[
+"🏠 Dashboard",
+"🕷️ Scrape & Search Jobs",
+"🤖 Job Recommendations",
+"📝 Self Assessment",
+"📈 Learning Roadmap",
+]
 )
 
 st.sidebar.markdown("---")
+
 st.sidebar.markdown(
-    """
-    **What this system does**
-    - 🔍 Scrapes real job data  
-    - 🤖 Matches skills intelligently  
-    - 🧠 Assesses knowledge with MCQs  
-    - 📈 Builds personalized roadmaps  
-    """
+"""
+<b>🚀 Platform Features</b>
+
+🔍 Real job scraping  
+🤖 AI skill matching  
+🧠 Knowledge assessments  
+📈 Learning roadmaps
+""",
+unsafe_allow_html=True
 )
+
+st.sidebar.markdown("---")
+st.sidebar.caption("Built with Streamlit • Ollama • MongoDB")
 
 # ------------------ DASHBOARD ------------------
 if page == "🏠 Dashboard":
+
     st.markdown(
-        """
-        <div class="dashboard-header">
-            <h1>AI-Powered Career Navigation System</h1>
-            <p>
-                A complete AI-driven career intelligence platform designed to help you
-                discover relevant jobs, understand skill gaps, assess your readiness,
-                and follow a structured roadmap to become job-ready.
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        """
-        <style>
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
-
-        section.main {
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        section.main > div {
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .block-container {
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            height: 100%;
-            overflow: hidden;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
+    """
+    <div class="dashboard-header">
+        <h1>AI-Powered Career Navigation System</h1>
+        <p>
+        Discover relevant jobs, identify skill gaps, assess readiness,
+        and follow structured learning paths toward your target career.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
     )
 
-    col1, col2, col3 = st.columns(3)
+    # ---------- STATS ----------
+    total_jobs = jobs_col.count_documents({})
+
+    c1,c2,c3 = st.columns(3)
+
+    c1.metric("📄 Jobs Collected",total_jobs)
+    c2.metric("🧠 AI Modules","4")
+    c3.metric("⚡ Recommendation Engine","Active")
+
+    st.markdown("---")
+
+    # ---------- FEATURE CARDS ----------
+    col1,col2,col3 = st.columns(3)
 
     with col1:
-        st.markdown(
-            """
-            <div class="dash-card">
-                <h3>🕷️ Job Scraping</h3>
-                <p>
-                    Automatically scrape the latest jobs from Merojob and store them in a
-                    structured database for analysis and search.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        
+        st.markdown("""
+        <div class="dash-card">
+        <h3>🕷️ Job Scraping</h3>
+        <p>
+        Automatically scrape real job postings from Merojob
+        and store them inside MongoDB for analysis.
+        </p>
+        </div>
+        """,unsafe_allow_html=True)
 
     with col2:
-        st.markdown(
-            """
-            <div class="dash-card">
-                <h3>🤖 Smart Recommendations</h3>
-                <p>
-                    Get transparent, skill-based job recommendations using semantic
-                    matching and career intelligence logic.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="dash-card">
+        <h3>🤖 Smart Recommendations</h3>
+        <p>
+        AI-powered job matching based on skill similarity
+        and semantic understanding.
+        </p>
+        </div>
+        """,unsafe_allow_html=True)
 
     with col3:
-        st.markdown(
-            """
-            <div class="dash-card">
-                <h3>🧠 Skill Assessment</h3>
-                <p>
-                    Test yourself with AI-generated MCQs and instantly identify weak
-                    areas with curated learning resources.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="dash-card">
+        <h3>🧠 Skill Assessment</h3>
+        <p>
+        AI generated MCQs help evaluate your knowledge
+        and identify weak areas.
+        </p>
+        </div>
+        """,unsafe_allow_html=True)
 
-    col4, col5 = st.columns(2)
+    col4,col5 = st.columns(2)
 
     with col4:
-        st.markdown(
-            """
-            <div class="dash-card">
-                <h3>📈 Learning Roadmaps</h3>
-                <p>
-                    Receive personalized, phase-wise learning roadmaps tailored to
-                    specific job roles and skill gaps.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="dash-card">
+        <h3>📈 Learning Roadmaps</h3>
+        <p>
+        Generate personalized learning paths
+        based on skill gaps.
+        </p>
+        </div>
+        """,unsafe_allow_html=True)
 
     with col5:
-        st.markdown(
-            """
-            <div class="dash-card">
-                <h3>🎯 Career Readiness</h3>
-                <p>
-                    Move from beginner to job-ready with clear guidance, assessments,
-                    and actionable career insights.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="dash-card">
+        <h3>🎯 Career Readiness</h3>
+        <p>
+        Track progress from beginner to job-ready
+        using assessments and learning paths.
+        </p>
+        </div>
+        """,unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # # ---------- FEEDBACK ----------
+    # st.markdown('<div class="page-title">💬 Feedback</div>',unsafe_allow_html=True)
+    # st.markdown('<div class="page-sub">Help us improve the platform</div>',unsafe_allow_html=True)
+
+    # with st.container():
+    #     name = st.text_input("Your Name")
+    #     feedback = st.text_area("Your Feedback")
+
+    #     if st.button("Submit Feedback"):
+    #         st.success("Thank you for your feedback!")
+
+    # st.markdown("---")
+
+    # ---------- CONTACT ----------
+    st.markdown('<div class="page-title">📩 Contact</div>',unsafe_allow_html=True)
+    st.write("For queries or suggestions contact us at:")
+    st.write("**careernavigator@gmail.com**")
+
+    st.markdown("---")
+
+    # ---------- TEAM ----------
+    st.markdown('<div class="page-title">👨‍💻 Project Team</div>',unsafe_allow_html=True)
+
+    t1,t2,t3,t4 = st.columns(4)
+
+    with t1:
+        st.markdown("""
+        <div class="team-card">
+        <img src="https://i.pravatar.cc/100?img=1">
+        <h4>Anuj Bhattarai</h4>
+        <p>Full stack Developer</p>
+        <p>ML & NLP Specialist</p>
+        </div>
+        """,unsafe_allow_html=True)
+
+    with t2:
+        st.markdown("""
+        <div class="team-card">
+        <img src="https://i.pravatar.cc/100?img=2">
+        <h4>Sagar Adhikari</h4>
+        <p>Frontend developer</p>
+        <p>System Design</p>
+        </div>
+        """,unsafe_allow_html=True)
+
+    with t3:
+        st.markdown("""
+        <div class="team-card">
+        <img src="https://i.pravatar.cc/100?img=3">
+        <h4>Bidhwota Giri</h4>
+        <p>QA</p>
+        <p>UI/UX Designer</p>
+        </div>
+        """,unsafe_allow_html=True)
+
+    with t4:
+        st.markdown("""
+        <div class="team-card">
+        <img src="https://i.pravatar.cc/100?img=4">
+        <h4>Apekshya Neupane</h4>
+        <p>Frontend developer</p>
+        <p>Job Market Research</p>
+        </div>
+        """,unsafe_allow_html=True)
 
 
 # ==================================================
@@ -290,7 +416,7 @@ elif page == "🕷️ Scrape & Search Jobs":
     st.markdown("---")
 
     # ------------------ SEARCH SECTION ------------------
-    st.subheader("🔍 Search Jobs in Database")
+    st.subheader("🔍 Search Jobs")
 
     col1, col2 = st.columns([3, 1])
 
@@ -316,7 +442,7 @@ elif page == "🕷️ Scrape & Search Jobs":
 
     jobs = list(jobs_col.find(query).sort("_id", -1).limit(limit))
 
-    st.markdown(f"### 📄 {len(jobs)} jobs found")
+    st.markdown(f"### 📄 jobs found")
 
     if not jobs:
         st.info("No jobs found. Try another keyword.")
@@ -355,17 +481,101 @@ elif page == "🤖 Job Recommendations":
     st.header("🤖 Job Recommendations")
     st.caption("Transparent skill-based matching using knowledge graph")
 
-    user_skills_input = st.multiselect(
-        "Your Skills",
-        sorted({s for j in jobs_col.find() for s in j.get("skills_required", [])})
+    # 🔹 Input Method Selection
+    input_mode = st.radio(
+        "Choose Input Method",
+        ["Select Skills Manually", "Upload Resume (PDF)"]
     )
 
-    if st.button("🎯 Get Recommendations", use_container_width=True):
+    user_skills = []
+
+    # ==================================================
+    # OPTION 1: MANUAL SKILL SELECTION (UNCHANGED LOGIC)
+    # ==================================================
+    if input_mode == "Select Skills Manually":
+        user_skills_input = st.multiselect(
+            "Your Skills",
+            sorted({s for j in jobs_col.find() for s in j.get("skills_required", [])})
+        )
+
         user_skills = [s.lower() for s in user_skills_input]
+
+    # ==================================================
+    # OPTION 2: RESUME UPLOAD
+    # ==================================================
+    else:
+        uploaded_file = st.file_uploader(
+            "Upload your resume (PDF only)",
+            type=["pdf"]
+        )
+
+        if uploaded_file is not None:
+            with st.spinner("Parsing resume..."):
+                resume_data = parse_resume(uploaded_file)
+
+            # # ==============================
+            # # 🔍 DEBUG SECTION
+            # # ==============================
+            # st.markdown("### 🔎 Debug Information")
+
+            # from src.resume_parser import extract_text_from_pdf, llm_call
+
+            # # Reset file pointer before re-reading
+            # uploaded_file.seek(0)
+
+            # raw_text = extract_text_from_pdf(uploaded_file)
+
+            # st.write("**Extracted Text Length:**", len(raw_text))
+            # st.text_area(
+            #     "Extracted Text Preview (first 1000 chars)",
+            #     raw_text[:1000],
+            #     height=200
+            # )
+
+            # # Show raw LLM response
+            # prompt_preview = raw_text[:3000]
+
+            # debug_prompt = f"""
+            # Extract skills as JSON only.
+            # Resume:
+            # {prompt_preview}
+            # """
+
+            # raw_llm_output = llm_call(debug_prompt)
+
+            # st.text_area(
+            #     "Raw LLM Output",
+            #     raw_llm_output,
+            #     height=200
+            # )
+
+            # # Show parsed output
+            # st.write("Parsed Resume Data:", resume_data)
+
+            # ==============================
+            # NORMAL FLOW
+            # ==============================
+
+            extracted_skills = resume_data.get("skills", [])
+
+            if not extracted_skills:
+                st.warning("No skills detected in resume.")
+            else:
+                st.success("Resume parsed successfully!")
+
+                st.write("### 🛠 Extracted Skills")
+                st.write(", ".join(s.title() for s in extracted_skills))
+
+                user_skills = extracted_skills
+    # ==================================================
+    # RECOMMENDATION ENGINE (UNCHANGED)
+    # ==================================================
+    if st.button("🎯 Get Recommendations", use_container_width=True):
+
         st.session_state["user_skills"] = user_skills
 
         if not user_skills:
-            st.warning("Please select at least one skill.")
+            st.warning("Please provide skills (manual selection or resume upload).")
         else:
             results = recommend_jobs(user_skills)
 
@@ -410,7 +620,6 @@ elif page == "🤖 Job Recommendations":
 
                         if job.get("url"):
                             st.markdown(f"🔗 [View Job Posting]({job['url']})")
-
 
 # ==================================================
 # TAB 4: SELF ASSESSMENT

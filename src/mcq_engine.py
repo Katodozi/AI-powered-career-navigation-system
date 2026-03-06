@@ -68,7 +68,7 @@ DO NOT add extra text.
 """
 
     result = subprocess.run(
-        ["ollama", "run", "gpt-oss:120b-cloud"],
+        ["ollama", "run", "gpt-oss:120b-cloud"], 
         input=prompt,
         text=True,
         encoding="utf-8",
