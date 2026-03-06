@@ -151,31 +151,59 @@ border:1px solid #1e293b;
 border-radius:16px;
 padding:1.2rem;
 text-align:center;
+transition:all .25s ease;
 }
 
-.team-card img{
-border-radius:50%;
+.team-card:hover{
+transform:translateY(-5px);
+box-shadow:0 10px 30px rgba(59,130,246,0.15);
+}
+
+/* ---------- TEAM IMAGE CONTAINER (STREAMLIT FIX) ---------- */
+[data-testid="stImage"]{
+display:flex;
+justify-content:center;
+align-items:center;
 margin-bottom:10px;
 }
 
+/* ---------- TEAM IMAGE ---------- */
+[data-testid="stImage"] img{
+width:230px !important;
+height:200px !important;
+object-fit:cover;
+border:3px solid #3b82f6;
+box-shadow:0 0 15px rgba(59,130,246,0.35);
+transition:all .3s ease;
+}
+
+/* Hover effect */
+[data-testid="stImage"] img:hover{
+transform:scale(1.05);
+box-shadow:0 0 25px rgba(59,130,246,0.6);
+}
+
+/* ---------- TEXT ---------- */
 .team-card h4{
 margin-bottom:2px;
 color:#60a5fa;
+font-size:1rem;
 }
 
 .team-card p{
 font-size:.85rem;
 color:#94a3b8;
+margin:2px 0;
 }
 
-/* ---------- FEEDBACK BOX ---------- */
-.feedback-box{
-background:#020617;
-border:1px solid #1e293b;
-border-radius:14px;
-padding:20px;
-margin-top:30px;
-}
+# /* ---------- FEEDBACK BOX ---------- */
+# .feedback-box{
+# background:#020617;
+# border:1px solid #1e293b;
+# border-radius:14px;
+# padding:20px;
+# margin-top:30px;
+# }
 
 </style>
 """,
@@ -336,9 +364,9 @@ if page == "🏠 Dashboard":
     t1,t2,t3,t4 = st.columns(4)
 
     with t1:
+        st.image("resume_and_images\oneandonly.jpg")
         st.markdown("""
         <div class="team-card">
-        <img src="https://i.pravatar.cc/100?img=1">
         <h4>Anuj Bhattarai</h4>
         <p>Full stack Developer</p>
         <p>ML & NLP Specialist</p>
@@ -346,9 +374,9 @@ if page == "🏠 Dashboard":
         """,unsafe_allow_html=True)
 
     with t2:
+        st.image("resume_and_images\sagar.jpg")
         st.markdown("""
         <div class="team-card">
-        <img src="https://i.pravatar.cc/100?img=2">
         <h4>Sagar Adhikari</h4>
         <p>Frontend developer</p>
         <p>System Design</p>
@@ -646,10 +674,10 @@ elif page == "📝 Self Assessment":
         else:
             st.subheader("Select a skill to assess")
 
-            selected_skill = st.radio(
+            selected_skill = st.selectbox(
                 "Skills from Recommended Jobs",
-                recommended_skills,
-                horizontal=True
+                recommended_skills
+                #horizontal=True
             )
 
             if st.button("🧠 Generate MCQs"):
