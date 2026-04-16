@@ -128,28 +128,47 @@ major_project/
 
 ---
 
-⚙️ Installation & Setup
-1️⃣ Clone the Repository
+## ⚙️ Installation & Setup
+
+### 1️⃣ Clone the Repository
+```bash
 git clone https://github.com/yourusername/job-intelligence-platform.git
 cd job-intelligence-platform
-2️⃣ Create & Activate Virtual Environment
+```
+
+### 2️⃣ Create & Activate Virtual Environment
+```bash
 python -m venv .venv
+```
 
 Activate:
 
+```bash
 # Windows
 .venv\Scripts\activate
 
 # macOS / Linux
 source .venv/bin/activate
-3️⃣ Install Dependencies
+```
+
+### 3️⃣ Install Dependencies
+```bash
 pip install -r requirements.txt
-4️⃣ Start MongoDB
+```
+
+### 4️⃣ Start MongoDB
 
 Ensure MongoDB is running locally:
 
+```bash
 mongodb://localhost:27017/
-▶️ Run the Application
+```
+
+---
+
+## ▶️ Run the Application
+```bash
 streamlit run app.py
+```
 
 The app will open automatically in your browser.
