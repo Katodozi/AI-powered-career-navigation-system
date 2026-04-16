@@ -128,65 +128,60 @@ major_project/
 
 ---
 
-## ⚙️ Installation & Setup
-
-### 1️⃣ Clone the Repository
-```bash
+⚙️ Installation & Setup
+1️⃣ Clone the Repository
 git clone https://github.com/yourusername/job-intelligence-platform.git
 cd job-intelligence-platform
-2️⃣ Create Virtual Environment
+2️⃣ Create & Activate Virtual Environment
 python -m venv .venv
-.venv\Scripts\activate   # Windows
+
+Activate:
+
+# Windows
+.venv\Scripts\activate
+
+# macOS / Linux
+source .venv/bin/activate
 3️⃣ Install Dependencies
 pip install -r requirements.txt
 4️⃣ Start MongoDB
+
 Ensure MongoDB is running locally:
 
 mongodb://localhost:27017/
-▶️ How to Run the Application
+▶️ Run the Application
 streamlit run app.py
-The application will automatically open in your default web browser.
+
+The app will open automatically in your browser.
 
 🧩 Application Modules
 🏠 Dashboard
 Overview of system capabilities
-
-Non-scrollable, card-based layout
-
+Card-based UI with minimal scrolling
 Entry point for users
-
 🕷️ Scrape & Search Jobs
-Scrapes real-time job data from Merojob
-
-Stores unique job postings in MongoDB
-
-Search jobs by title, company, skills, or description
-
+Scrapes real-time jobs from Merojob
+Stores unique listings in MongoDB
+Search by title, company, skills, or description
 🤖 Job Recommendations
-User inputs their skills
+Input user skills
+Matches against job requirements
 
-System matches skills with job requirements
+Outputs:
 
-Displays matched skills and missing skill gaps
-
+✅ Matched skills
+❌ Missing skills (skill gap)
 📝 Skill Self-Assessment
-Skill-specific MCQs
-
-Automatic scoring (out of 100)
-
+MCQs based on selected skill
+Auto scoring (out of 100)
 Weak topic identification
-
-Learning resources generated after submission
-
+Learning resources provided
 📈 Learning Roadmap
 Structured learning phases
-
 Skill prioritization
-
 Role-based guidance
-
 🗄️ Database Schema
-Jobs Collection
+📦 Jobs Collection
 {
   "title": "Backend Developer",
   "company": "ABC Tech",
@@ -196,55 +191,43 @@ Jobs Collection
   "url": "https://example.com/job"
 }
 🤖 AI & Recommendation Logic
-Skill Matching Logic
-Normalizes skills to lowercase
-
-Matches user skills against job-required skills
-
-Matched Skills = User Skills ∩ Job Skills
-Skill Gap = Job Skills − User Skills
+🔍 Skill Matching
+Normalize skills to lowercase
+Apply set operations:
+Matched Skills = User Skills ∩ Job Skills  
+Skill Gap      = Job Skills − User Skills
 🧠 MCQ & Learning Resource Generation
-MCQs generated dynamically per selected skill
+Dynamic MCQs per skill
+Topic-based questions
+Automatic weak-area detection
 
-Each question includes a topic label
-
-Weak areas detected automatically
-
-Learning resources include:
+Resources include:
 
 📚 Books
-
 🎓 Online courses
-
-🎨 UI/UX Design Principles
-Sidebar navigation (replaces tabs)
-
-Dashboard-first design
-
+🎨 UI/UX Design
+Sidebar navigation
+Dashboard-first layout
 Minimal scrolling
-
-Card-based information layout
-
-Professional dark theme
-
+Card-based interface
+Dark theme
 ⚠️ Known Limitations
 Single job source (Merojob)
-
 No user authentication
-
-MCQ difficulty is static
-
-Roadmaps are template-based
-
+Static MCQ difficulty
+Template-based learning roadmap
 🔮 Future Enhancements
 Multi-source job scraping
-
-User login and profile persistence
-
+User authentication & profiles
 Adaptive MCQ difficulty
-
 Resume parsing & ATS scoring
-
-Advanced NLP skill embeddings
-
+Advanced NLP-based skill embeddings
 Exportable reports (PDF)
+📌 Tech Stack
+Frontend: Streamlit
+Backend: Python
+Database: MongoDB
+ML Logic: Custom Recommendation System
+📄 License
+
+This project is for educational purposes.
