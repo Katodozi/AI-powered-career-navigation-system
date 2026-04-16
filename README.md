@@ -71,25 +71,24 @@ The platform guides users from **job discovery → skill assessment → improvem
 
 ## 🏗️ System Architecture
 
-┌────────────┐
-│ Streamlit  │ ← User Interface
-└─────┬──────┘
-      │
-┌─────▼────────────┐
-│ Application Core │
-│ (Recommender,    │
-│ MCQ Engine)      │
-└─────┬────────────┘
-      │
-┌─────▼────────────┐
-│ MongoDB Database │
-│ (Job Storage)    │
-└─────┬────────────┘
-      │
-┌─────▼────────────┐
-│ Web Scraper      │
-│ (Merojob)        │
-└───────────────── ┘
+The application follows a layered architecture:
+
+1. **Frontend (UI)**
+   - Built using **Streamlit**
+   - Handles user interaction and displays recommendations & MCQs
+
+2. **Application Core**
+   - Contains:
+     - Recommender System
+     - MCQ Generation Engine
+
+3. **Database Layer**
+   - **MongoDB**
+   - Stores job data and processed information
+
+4. **Data Collection Layer**
+   - Web scraper for **Merojob**
+   - Fetches job listings for processing
 
 
 ---
@@ -117,16 +116,14 @@ The platform guides users from **job discovery → skill assessment → improvem
 ## 📂 Project Structure
 
 major_project/
-│
-├── app.py # Main Streamlit application
-├── src/
-│ ├── job_api.py # Job scraping logic
-│ ├── recommender.py # Job recommendation engine
-│ ├── mcq_engine.py # MCQ & learning resource generator
-│
-├── requirements.txt
-├── README.md
-└── .venv/
+- **app.py** – Entry point of the Streamlit application (UI layer)
+- **src/** – Contains core business logic:
+  - `job_api.py` – Handles job scraping
+  - `recommender.py` – Implements recommendation system
+  - `mcq_engine.py` – Generates MCQs and learning resources
+- **requirements.txt** – Python dependencies
+- **README.md** – Project documentation
+- **.venv/** – Virtual environment (not pushed to Git)
 
 
 ---
