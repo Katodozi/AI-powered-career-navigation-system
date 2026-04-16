@@ -72,24 +72,24 @@ The platform guides users from **job discovery → skill assessment → improvem
 ## 🏗️ System Architecture
 
 ┌────────────┐
-│ Streamlit │ ← User Interface
+│ Streamlit  │ ← User Interface
 └─────┬──────┘
-│
+      │
 ┌─────▼────────────┐
 │ Application Core │
-│ (Recommender, │
-│ MCQ Engine) │
+│ (Recommender,    │
+│ MCQ Engine)      │
 └─────┬────────────┘
-│
+      │
 ┌─────▼────────────┐
 │ MongoDB Database │
-│ (Job Storage) │
+│ (Job Storage)    │
 └─────┬────────────┘
-│
+      │
 ┌─────▼────────────┐
-│ Web Scraper │
-│ (Merojob) │
-└─────────────────┘
+│ Web Scraper      │
+│ (Merojob)        │
+└───────────────── ┘
 
 
 ---
